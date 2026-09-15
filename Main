@@ -1,1 +1,76 @@
-u
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import java.lang.Math;
+
+@TeleOp(name = "BIOBUZZ Swerve Basic", group = "TeleOp")
+public class SwerveBasic extends LinearOpMode {
+
+    private DcMotor backleft;
+    private DcMotor backright;
+    private DcMotor frontleft;
+    private DcMotor frontright;
+
+    @Override
+    public void runOpMode() {
+
+        backleft = hardwareMap.get(DcMotor.class, "backleft");
+        backright = hardwareMap.get(DcMotor.class, "backright");
+        frontleft = hardwareMap.get(DcMotor.class, "frontleft");
+        frontright = hardwareMap.get(DcMotor.class, "frontright");
+
+        frontleft.setDirection(DcMotor.Direction.REVERSE);
+        backleft.setDirection(DcMotor.Direction.REVERSE);
+        frontright.setDirection(DcMotor.Direction.FORWARD);
+        backright.setDirection(DcMotor.Direction.FORWARD);
+
+        frontleft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontright.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backleft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backright.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontleft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontright.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backleft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backright.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        telemetry.addLine("BIOBUZZ Swerve");
+        telemetry.addLine("Robot Ready");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            double drive = -gamepad1.left_stick_y;
+
+            if (Math.abs(drive) < 0.05) {
+                drive = 0;
+            }
+
+            drive = Range.clip(drive, -1.0, 1.0);
+
+            frontleft.setPower(drive);
+            frontright.setPower(drive);
+            backleft.setPower(drive);
+            backright.setPower(drive);
+
+            telemetry.addData("Drive Power", "%.2f", drive);
+            telemetry.addData("Left Stick Y", "%.2f", gamepad1.left_stick_y);
+            telemetry.update();
+        }
+
+        frontleft.setPower(0);
+        frontright.setPower(0);
+        backleft.setPower(0);
+        backright.setPower(0);
+    }
+}
