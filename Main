@@ -42,20 +42,37 @@ public class Main extends LinearOpMode {
 
         while (opModeIsActive()) {
             double drive = -gamepad1.left_stick_y;
+            double turn = gamepad1.right_stick_x;
 
             if (Math.abs(drive) < DEADZONE) {
                 drive = 0;
             }
+            if (Math.abs(turn) < DEADZONE) {
+                turn = 0;
+            }
 
-            drive = Range.clip(drive, -1.0, 1.0);
-            setMotorPowers(drive);
+            double frontLeftPower = drive + turn;
+            double frontRightPower = drive - turn;
+            double backLeftPower = drive + turn;
+            double backRightPower = drive - turn;
+
+            double maxPower = Math.max(1.0, Math.max(
+                    Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
+                    Math.max(Math.abs(backLeftPower), Math.abs(backRightPower))));
+
+            setMotorPowers(
+                    frontLeftPower / maxPower,
+                    frontRightPower / maxPower,
+                    backLeftPower / maxPower,
+                    backRightPower / maxPower);
 
             telemetry.addData("Drive Power", "%.2f", drive);
-            telemetry.addData("Left Stick Y", "%.2f", gamepad1.left_stick_y);
+            telemetry.addData("Turn Power", "%.2f", turn);
+            telemetry.addData("Right Stick X", "%.2f", gamepad1.right_stick_x);
             telemetry.update();
         }
 
-        setMotorPowers(0.0);
+        setMotorPowers(0.0, 0.0, 0.0, 0.0);
     }
 
     private void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
@@ -65,10 +82,11 @@ public class Main extends LinearOpMode {
         backRight.setZeroPowerBehavior(behavior);
     }
 
-    private void setMotorPowers(double power) {
-        frontLeft.setPower(power);
-        frontRight.setPower(power);
-        backLeft.setPower(power);
-        backRight.setPower(power);
+    private void setMotorPowers(double frontLeftPower, double frontRightPower,
+                                double backLeftPower, double backRightPower) {
+        frontLeft.setPower(Range.clip(frontLeftPower, -1.0, 1.0));
+        frontRight.setPower(Range.clip(frontRightPower, -1.0, 1.0));
+        backLeft.setPower(Range.clip(backLeftPower, -1.0, 1.0));
+        backRight.setPower(Range.clip(backRightPower, -1.0, 1.0));
     }
 }
