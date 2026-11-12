@@ -1,46 +1,38 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import java.lang.Math;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "BIOBUZZ Swerve Basic", group = "TeleOp")
-public class SwerveBasic extends LinearOpMode {
+public class Main extends LinearOpMode {
 
-    private DcMotor backleft;
-    private DcMotor backright;
-    private DcMotor frontleft;
-    private DcMotor frontright;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+
+    private static final double DEADZONE = 0.05;
 
     @Override
     public void runOpMode() {
+        frontLeft = hardwareMap.get(DcMotor.class, "frontleft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontright");
+        backLeft = hardwareMap.get(DcMotor.class, "backleft");
+        backRight = hardwareMap.get(DcMotor.class, "backright");
 
-        backleft = hardwareMap.get(DcMotor.class, "backleft");
-        backright = hardwareMap.get(DcMotor.class, "backright");
-        frontleft = hardwareMap.get(DcMotor.class, "frontleft");
-        frontright = hardwareMap.get(DcMotor.class, "frontright");
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
 
-        frontleft.setDirection(DcMotor.Direction.REVERSE);
-        backleft.setDirection(DcMotor.Direction.REVERSE);
-        frontright.setDirection(DcMotor.Direction.FORWARD);
-        backright.setDirection(DcMotor.Direction.FORWARD);
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        frontleft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontright.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backleft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backright.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        frontleft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontright.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backleft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backright.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         telemetry.addLine("BIOBUZZ Swerve");
         telemetry.addLine("Robot Ready");
@@ -49,28 +41,34 @@ public class SwerveBasic extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-
             double drive = -gamepad1.left_stick_y;
 
-            if (Math.abs(drive) < 0.05) {
+            if (Math.abs(drive) < DEADZONE) {
                 drive = 0;
             }
 
             drive = Range.clip(drive, -1.0, 1.0);
-
-            frontleft.setPower(drive);
-            frontright.setPower(drive);
-            backleft.setPower(drive);
-            backright.setPower(drive);
+            setMotorPowers(drive);
 
             telemetry.addData("Drive Power", "%.2f", drive);
             telemetry.addData("Left Stick Y", "%.2f", gamepad1.left_stick_y);
             telemetry.update();
         }
 
-        frontleft.setPower(0);
-        frontright.setPower(0);
-        backleft.setPower(0);
-        backright.setPower(0);
+        setMotorPowers(0.0);
+    }
+
+    private void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
+        frontLeft.setZeroPowerBehavior(behavior);
+        frontRight.setZeroPowerBehavior(behavior);
+        backLeft.setZeroPowerBehavior(behavior);
+        backRight.setZeroPowerBehavior(behavior);
+    }
+
+    private void setMotorPowers(double power) {
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
     }
 }
