@@ -41,33 +41,21 @@ public class Main extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            double leftDrive = -gamepad1.left_stick_y;
-            double rightTurn = gamepad1.right_stick_x;
+            double leftPower = -gamepad1.left_stick_y;
+            double rightPower = -gamepad1.right_stick_y;
 
-            if (Math.abs(leftDrive) < DEADZONE) {
-                leftDrive = 0;
+            if (Math.abs(leftPower) < DEADZONE) {
+                leftPower = 0;
             }
-            if (Math.abs(rightTurn) < DEADZONE) {
-                rightTurn = 0;
+            if (Math.abs(rightPower) < DEADZONE) {
+                rightPower = 0;
             }
 
-            double frontLeftPower = leftDrive + rightTurn;
-            double frontRightPower = leftDrive - rightTurn;
-            double backLeftPower = leftDrive + rightTurn;
-            double backRightPower = leftDrive - rightTurn;
+            // Each stick controls only the wheels on its corresponding side.
+            setMotorPowers(leftPower, rightPower, leftPower, rightPower);
 
-            double maxPower = Math.max(1.0, Math.max(
-                    Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
-                    Math.max(Math.abs(backLeftPower), Math.abs(backRightPower))));
-
-            setMotorPowers(
-                    frontLeftPower / maxPower,
-                    frontRightPower / maxPower,
-                    backLeftPower / maxPower,
-                    backRightPower / maxPower);
-
-            telemetry.addData("Left Stick Y", "%.2f", gamepad1.left_stick_y);
-            telemetry.addData("Turn", "%.2f", rightTurn);
+            telemetry.addData("Left Side Power", "%.2f", leftPower);
+            telemetry.addData("Right Side Power", "%.2f", rightPower);
             telemetry.update();
         }
 
